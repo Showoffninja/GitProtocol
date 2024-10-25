@@ -1,6 +1,6 @@
 # Git Protocol Validation 1.0
 
-===========================
+==========================
 
 This library is a method to validate the setup of a github project. It will compare the configuration of the project to the requirements for using Github as a source control system. The library will check the following:
 
