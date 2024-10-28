@@ -17,7 +17,7 @@ Although we do not quality GitHub itself, we still need to consider if we use sp
 Any solution that is based on GitHub should be verified in the following way:
 
 | Github Functionality                                                                                                                                    | Approach to Github verification                                                                                                                                                                                                                                                                                            |
-| ------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | The repository feature (git) of Github must ensure immutable versioning of all objects (code, documentation, artifacts, etc.) stored in the repository. | Git will always ensure immutable versioning of all files stored. This is not a configurable behaviour, but fixed functionality, and hence no configuration verification is needed.                                                                                                                                         |
 | Enforce pull requests with at least one reviewer on all changes to the branch where compliance documentation is stored (e.g. master branch).            | This is a configurable feature of GitHub. We should verify that this feature is enabled.                                                                                                                                                                                                                                   |
 | Pull requests must be retained indefinitely                                                                                                             | Pull request must never be deleted automatically, since they form the formal approvals of our compliance documentation in Git. Pull request are always kept by GitHub for as long as the project exists. This is not a configurable behaviour, but fixed functionality, and hence no configuration verification is needed. |
@@ -75,3 +75,46 @@ approval_gates:
   - branch: "master"
     required_approvers: 2
 ```
+
+# Setup Instructions
+
+## Prerequisites
+
+1. Python 3.6 or higher
+2. `pip` (Python package installer)
+3. GitHub personal access token with `repo` and `admin:repo_hook` permissions
+
+## Installation
+
+1. Clone the repository:
+    ```sh
+    git clone https://github.com/your-repo-owner/your-repo-name.git
+    cd your-repo-name
+    ```
+
+2. Install the required Python packages:
+    ```sh
+    pip install -r requirements.txt
+    ```
+
+## Usage
+
+1. Set the `GITHUB_TOKEN` environment variable with your GitHub personal access token:
+    ```sh
+    export GITHUB_TOKEN=your_github_token
+    ```
+
+2. Run the verification script:
+    ```sh
+    python gitverify.py
+    ```
+
+# Troubleshooting
+
+## Common Issues
+
+1. **Invalid GitHub token**: Ensure that the `GITHUB_TOKEN` environment variable is set correctly and has the necessary permissions.
+2. **Network issues**: Check your internet connection and ensure that GitHub's API is accessible.
+3. **Invalid `protocol.yml` format**: Ensure that the `protocol.yml` file is correctly formatted and follows the required structure.
+
+If you encounter any other issues, please open an issue on the repository's GitHub page.
