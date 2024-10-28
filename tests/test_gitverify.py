@@ -1,9 +1,19 @@
 import os
+import sys
 import pytest
 import requests
 import yaml
 from unittest.mock import patch, mock_open
-from gitverify import load_protocol, get_branch_protection_rules, verify_branch_protection, report_results
+
+# Adjust the import path to the location of the gitverify.py file
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
+from gitverify import (
+    load_protocol,
+    get_branch_protection_rules,
+    verify_branch_protection,
+    report_results,
+)
 
 
 def test_load_protocol_valid_file():
@@ -46,7 +56,12 @@ def test_get_branch_protection_rules_success():
         mock_get.return_value.json.return_value = mock_response
         mock_get.return_value.raise_for_status = lambda: None
         branch_protection = get_branch_protection_rules(owner, repo, branch, headers)
-        assert branch_protection["required_pull_request_reviews"]["required_approving_review_count"] == 2
+        assert (
+            branch_protection["required_pull_request_reviews"][
+                "required_approving_review_count"
+            ]
+            == 2
+        )
         assert branch_protection["allow_force_pushes"]["enabled"] is False
         assert branch_protection["enforce_admins"]["enabled"] is True
 
