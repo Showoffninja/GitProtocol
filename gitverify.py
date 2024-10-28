@@ -4,15 +4,23 @@ import requests
 
 
 def load_protocol(file_path):
-    with open(file_path, "r") as file:
-        return yaml.safe_load(file)
+    try:
+        with open(file_path, "r") as file:
+            return yaml.safe_load(file)
+    except FileNotFoundError:
+        raise FileNotFoundError(f"Protocol file not found: {file_path}")
+    except yaml.YAMLError:
+        raise ValueError(f"Invalid YAML format in protocol file: {file_path}")
 
 
 def get_branch_protection_rules(owner, repo, branch, headers):
     url = f"https://api.github.com/repos/{owner}/{repo}/branches/{branch}/protection"
-    response = requests.get(url, headers=headers)
-    response.raise_for_status()
-    return response.json()
+    try:
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()
+        return response.json()
+    except requests.exceptions.RequestException as e:
+        raise ConnectionError(f"Network error while fetching branch protection rules: {e}")
 
 
 def verify_branch_protection(protocol, branch_protection):
@@ -40,6 +48,9 @@ def report_results(results):
 
 if __name__ == "__main__":
     GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
+    if not GITHUB_TOKEN:
+        raise EnvironmentError("GITHUB_TOKEN environment variable not set.")
+    
     REPO_OWNER = "your-repo-owner"
     REPO_NAME = "your-repo-name"
 
@@ -48,9 +59,12 @@ if __name__ == "__main__":
         "Accept": "application/vnd.github.v3+json",
     }
 
-    protocol = load_protocol("protocol.yml")
-    branch_protection = get_branch_protection_rules(
-        REPO_OWNER, REPO_NAME, "master", headers
-    )
-    verification_results = verify_branch_protection(protocol, branch_protection)
-    report_results(verification_results)
+    try:
+        protocol = load_protocol("protocol.yml")
+        branch_protection = get_branch_protection_rules(
+            REPO_OWNER, REPO_NAME, "master", headers
+        )
+        verification_results = verify_branch_protection(protocol, branch_protection)
+        report_results(verification_results)
+    except Exception as e:
+        print(f"Error: {e}")
