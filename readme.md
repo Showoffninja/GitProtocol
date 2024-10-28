@@ -1,6 +1,6 @@
 # Git Protocol Validation 1.0
 
-===========================
+==========================
 
 This library is a method to validate the setup of a github project. It will compare the configuration of the project to the requirements for using Github as a source control system. The library will check the following:
 
@@ -8,7 +8,7 @@ GitHub is considered a ”Tool” in GAMP5 terminology:
 
     ”Tools and systems supporting life cycles, IT processes, and infrastructure (rather than directly supporting product life cycle processes) are not themselves GxP regulated systems and should not be subject to specific validation but managed by routine company assessment and assurance practices and good IT practices”
 
-Hence, we do not qualify GitHub itself.
+Hence, we do not qualify GitHub itself...
 
 # Strategy for Verification of GitHub Configuration
 
