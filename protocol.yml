@@ -1,0 +1,52 @@
+protocol:
+  project_name: "My Project"
+  Github:
+    organization: "myOrg"
+    project: "myProject"
+    deployment_branch: "main"
+    release_branch: "release"
+
+  environments:
+    - name: "Development"
+      branch: "development"
+      approval_gates:
+        - branch: "development"
+          required_approvers: 1
+
+    - name: "Test"
+      branch: "test"
+    - name: "Production"
+      branch: "production"
+
+  approvers:
+    - name: "Reviewer 1"
+      email: "some@email.com"
+    - name: "Reviewer 2"
+      email: "some@email.com"
+
+  branch_protection_rules:
+    - branch: "main"
+      required_reviewers: 2
+      allow_force_push: False
+      allow_bypass: False
+    - branch: "release"
+      required_reviewers: 1
+      allow_force_push: False
+      allow_bypass: False
+
+  required_status_checks:
+    - branch: "main"
+      checks:
+        - name: "build"
+        - name: "test"
+    - branch: "release"
+      checks:
+        - name: "build"
+
+  code_owners:
+    - path: "/"
+      owners:
+        - "@myOrg/reviewers"
+    - path: "/src"
+      owners:
+        - "@myOrg/developers"
