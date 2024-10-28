@@ -64,9 +64,40 @@ def test_get_branch_protection_rules_network_error():
 def test_verify_branch_protection():
     protocol = {
         "protocol": {
-            "required_reviewers": 2,
-            "allow_force_push": False,
-            "allow_bypass": False,
+            "branch_protection_rules": [
+                {
+                    "branch": "main",
+                    "required_reviewers": 2,
+                    "allow_force_push": False,
+                    "allow_bypass": False,
+                },
+                {
+                    "branch": "release",
+                    "required_reviewers": 1,
+                    "allow_force_push": False,
+                    "allow_bypass": False,
+                },
+            ],
+            "required_status_checks": [
+                {
+                    "branch": "main",
+                    "checks": ["build", "test"],
+                },
+                {
+                    "branch": "release",
+                    "checks": ["build"],
+                },
+            ],
+            "code_owners": [
+                {
+                    "path": "/",
+                    "owners": ["@myOrg/reviewers"],
+                },
+                {
+                    "path": "/src",
+                    "owners": ["@myOrg/developers"],
+                },
+            ],
         }
     }
     branch_protection = {
@@ -75,19 +106,113 @@ def test_verify_branch_protection():
         "enforce_admins": {"enabled": False},
     }
     results = verify_branch_protection(protocol, branch_protection)
-    assert results["required_reviewers"] is True
-    assert results["allow_force_push"] is True
-    assert results["allow_bypass"] is True
+    assert results["main"]["required_reviewers"] is True
+    assert results["main"]["allow_force_push"] is True
+    assert results["main"]["allow_bypass"] is True
+    assert results["release"]["required_reviewers"] is True
+    assert results["release"]["allow_force_push"] is True
+    assert results["release"]["allow_bypass"] is True
 
 
-def test_report_results(capsys):
+def test_report_results_text(capsys):
     results = {
-        "required_reviewers": True,
-        "allow_force_push": False,
-        "allow_bypass": True,
+        "main": {
+            "required_reviewers": True,
+            "allow_force_push": False,
+            "allow_bypass": True,
+        },
+        "release": {
+            "required_reviewers": True,
+            "allow_force_push": False,
+            "allow_bypass": True,
+        },
     }
-    report_results(results)
+    report_results(results, format="text")
     captured = capsys.readouterr()
+    assert "Branch: main" in captured.out
     assert "required_reviewers: PASS" in captured.out
     assert "allow_force_push: FAIL" in captured.out
     assert "allow_bypass: PASS" in captured.out
+    assert "Branch: release" in captured.out
+    assert "required_reviewers: PASS" in captured.out
+    assert "allow_force_push: FAIL" in captured.out
+    assert "allow_bypass: PASS" in captured.out
+
+
+def test_report_results_json():
+    results = {
+        "main": {
+            "required_reviewers": True,
+            "allow_force_push": False,
+            "allow_bypass": True,
+        },
+        "release": {
+            "required_reviewers": True,
+            "allow_force_push": False,
+            "allow_bypass": True,
+        },
+    }
+    report_results(results, format="json")
+    with open("verification_report.json", "r") as file:
+        report = json.load(file)
+        assert report["repository"] == "your-repo-owner/your-repo-name"
+        assert report["results"]["main"]["required_reviewers"] is True
+        assert report["results"]["main"]["allow_force_push"] is False
+        assert report["results"]["main"]["allow_bypass"] is True
+        assert report["results"]["release"]["required_reviewers"] is True
+        assert report["results"]["release"]["allow_force_push"] is False
+        assert report["results"]["release"]["allow_bypass"] is True
+
+
+def test_report_results_html():
+    results = {
+        "main": {
+            "required_reviewers": True,
+            "allow_force_push": False,
+            "allow_bypass": True,
+        },
+        "release": {
+            "required_reviewers": True,
+            "allow_force_push": False,
+            "allow_bypass": True,
+        },
+    }
+    report_results(results, format="html")
+    with open("verification_report.html", "r") as file:
+        content = file.read()
+        assert "<h1>Verification Report</h1>" in content
+        assert "<li>Branch: main<ul>" in content
+        assert "<li>required_reviewers: PASS</li>" in content
+        assert "<li>allow_force_push: FAIL</li>" in content
+        assert "<li>allow_bypass: PASS</li>" in content
+        assert "<li>Branch: release<ul>" in content
+        assert "<li>required_reviewers: PASS</li>" in content
+        assert "<li>allow_force_push: FAIL</li>" in content
+        assert "<li>allow_bypass: PASS</li>" in content
+
+
+def test_report_results_markdown():
+    results = {
+        "main": {
+            "required_reviewers": True,
+            "allow_force_push": False,
+            "allow_bypass": True,
+        },
+        "release": {
+            "required_reviewers": True,
+            "allow_force_push": False,
+            "allow_bypass": True,
+        },
+    }
+    report_results(results, format="markdown")
+    with open("verification_report.md", "r") as file:
+        content = file.read()
+        assert "# Verification Report" in content
+        assert "## Branch: main" in content
+        assert "- **required_reviewers:** PASS" in content
+        assert "- **allow_force_push:** FAIL" in content
+        assert "- **allow_bypass:** PASS" in content
+        assert "## Branch: release" in content
+        assert "- **required_reviewers:** PASS" in content
+        assert "- **allow_force_push:** FAIL" in content
+        assert "- **allow_bypass:** PASS" in content
