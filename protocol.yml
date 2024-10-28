@@ -1,10 +1,10 @@
 protocol:
   project_name: "My Project"
   Github:
-    organization: "myOrg"
-    project: "myProject"
+    organization: "bidma-nn"
+    project: "SQZC_sandbox"
     deployment_branch: "main"
-    release_branch: "release"
+    release_branch: "main"
 
   environments:
     - name: "Development"
@@ -26,11 +26,11 @@ protocol:
 
   branch_protection_rules:
     - branch: "main"
-      required_reviewers: 2
+      required_reviewers: 1
       allow_force_push: False
       allow_bypass: False
     - branch: "release"
-      required_reviewers: 1
+      required_reviewers: 2
       allow_force_push: False
       allow_bypass: False
 
@@ -39,7 +39,7 @@ protocol:
       checks:
         - name: "build"
         - name: "test"
-    - branch: "release"
+    - branch: "main"
       checks:
         - name: "build"
 

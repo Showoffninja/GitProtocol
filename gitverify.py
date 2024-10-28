@@ -18,7 +18,7 @@ def load_protocol(file_path):
 def get_branch_protection_rules(owner, repo, branch, headers):
     url = f"https://api.github.com/repos/{owner}/{repo}/branches/{branch}/protection"
     try:
-        response = requests.get(url, headers=headers)
+        response = requests.get(url, headers=headers, verify=False)
         response.raise_for_status()
         return response.json()
     except requests.exceptions.RequestException as e:
@@ -47,7 +47,8 @@ def verify_branch_protection(protocol, branch_protection):
             >= required_reviewers,
             "allow_force_push": branch_protection["allow_force_pushes"]["enabled"]
             == allow_force_push,
-            "allow_bypass": branch_protection["enforce_admins"]["enabled"] == allow_bypass,
+            "allow_bypass": branch_protection["enforce_admins"]["enabled"]
+            == allow_bypass,
         }
     return results
 
@@ -98,8 +99,8 @@ if __name__ == "__main__":
     if not GITHUB_TOKEN:
         raise EnvironmentError("GITHUB_TOKEN environment variable is not set")
 
-    REPO_OWNER = "your-repo-owner"
-    REPO_NAME = "your-repo-name"
+    REPO_OWNER = "bidma-nn"
+    REPO_NAME = "SQZC_Sandbox"
 
     headers = {
         "Authorization": f"token {GITHUB_TOKEN}",
@@ -109,6 +110,6 @@ if __name__ == "__main__":
     try:
         protocol = load_protocol("protocol.yml")
         verification_results = verify_branch_protection(protocol, headers)
-        report_results(verification_results, format="json")
+        report_results(verification_results, format="html")
     except Exception as e:
         print(f"Error: {e}")

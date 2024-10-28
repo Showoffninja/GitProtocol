@@ -1,0 +1,11 @@
+{
+    "verification_date": "2024-10-28 10:51:47",
+    "repository": "bidma-nn/SQZC_Sandbox",
+    "results": {
+        "main": {
+            "required_reviewers": true,
+            "allow_force_push": true,
+            "allow_bypass": true
+        }
+    }
+}
