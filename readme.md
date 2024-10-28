@@ -33,6 +33,8 @@ The following steps should be taken to verify the configuration of GitHub:
 5. Verify that the branch protection rules are set up to enforce pull requests with at least one reviewer on the branch where compliance documentation is stored (e.g. master branch).
 6. Verify that the branch protection rules can't be bypassed, ensured by the setting: "Do not allow bypassing the above settings" is **NOT** ticked
 7. Verify that the "Allow force push" setting is **NOT** ticked
+8. Verify that the required status checks are set up for the branches specified in the protocol.yml file.
+9. Verify that the code owner files are set up for the paths specified in the protocol.yml file.
 
 Document these configurations in your verification plan documentation.
 
@@ -71,9 +73,32 @@ protocol:
     - name: "Reviewer 2"
       email: "some@email.com"
 
-approval_gates:
-  - branch: "master"
-    required_approvers: 2
+  branch_protection_rules:
+    - branch: "main"
+      required_reviewers: 2
+      allow_force_push: False
+      allow_bypass: False
+    - branch: "release"
+      required_reviewers: 1
+      allow_force_push: False
+      allow_bypass: False
+
+  required_status_checks:
+    - branch: "main"
+      checks:
+        - name: "build"
+        - name: "test"
+    - branch: "release"
+      checks:
+        - name: "build"
+
+  code_owners:
+    - path: "/"
+      owners:
+        - "@myOrg/reviewers"
+    - path: "/src"
+      owners:
+        - "@myOrg/developers"
 ```
 
 # Setup Instructions
