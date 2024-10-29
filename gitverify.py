@@ -15,14 +15,30 @@ def load_protocol(file_path):
         raise ValueError(f"Error parsing the protocol file: {file_path}")
 
 
+# Verification of branch protection rules
 def get_branch_protection_rules(owner, repo, branch, headers):
     url = f"https://api.github.com/repos/{owner}/{repo}/branches/{branch}/protection"
     try:
-        response = requests.get(url, headers=headers, verify=False)
+        response = requests.get(
+            url, headers=headers, verify=False
+        )  # verify=False is used to ignore SSL certificate verification, due to ZScaler
         response.raise_for_status()
         return response.json()
     except requests.exceptions.RequestException as e:
         raise ConnectionError(f"Error fetching branch protection rules: {e}")
+
+
+# Verification of environment protection rules
+def get_environment_protection_rules(owner, repo, environment, headers):
+    url = f"https://api.github.com/repos/{owner}/{repo}/environments/{environment}/protection"
+    try:
+        response = requests.get(
+            url, headers=headers, verify=False
+        )  # verify=False is used to ignore SSL certificate verification, due to ZScaler
+        response.raise_for_status()
+        return response.json()
+    except requests.exceptions.RequestException as e:
+        raise ConnectionError(f"Error fetching environment protection rules: {e}")
 
 
 def verify_branch_protection(protocol, branch_protection):
