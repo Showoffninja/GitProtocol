@@ -9,14 +9,21 @@ protocol:
   environments:
     - name: "Development"
       branch: "development"
+      required_reviewers: 1
       approval_gates:
         - branch: "development"
           required_approvers: 1
+      required_approvers: ["Reviewer 1", "Reviewer 2"]
 
     - name: "Test"
       branch: "test"
+      required_reviewers: 2
+      required_approvers: ["Reviewer 1", "Reviewer 2"]
+
     - name: "Production"
       branch: "production"
+      required_reviewers: 3
+      required_approvers: ["Reviewer 1", "Reviewer 2"]
 
   approvers:
     - name: "Reviewer 1"

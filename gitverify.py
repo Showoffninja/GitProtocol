@@ -41,7 +41,28 @@ def get_environment_protection_rules(owner, repo, environment, headers):
         raise ConnectionError(f"Error fetching environment protection rules: {e}")
 
 
-def verify_branch_protection(protocol, branch_protection):
+def verify_environment_protection(protocol, headers):
+    results = {}
+    for environment in protocol["protocol"]["environments"]:
+        env_name = environment["name"]
+        required_reviewers = environment["required_reviewers"]
+        required_approvers = environment["required_approvers"]
+
+        env_protection = get_environment_protection_rules(
+            protocol["protocol"]["Github"]["organization"],
+            protocol["protocol"]["Github"]["project"],
+            env_name,
+            headers,
+        )
+
+        results[env_name] = {
+            "required_reviewers": env_protection["required_reviewers"] >= required_reviewers,
+            "required_approvers": all(approver in env_protection["approvers"] for approver in required_approvers),
+        }
+    return results
+
+
+def verify_branch_protection(protocol, headers):
     results = {}
     for rule in protocol["protocol"]["branch_protection_rules"]:
         branch = rule["branch"]
@@ -66,6 +87,10 @@ def verify_branch_protection(protocol, branch_protection):
             "allow_bypass": branch_protection["enforce_admins"]["enabled"]
             == allow_bypass,
         }
+
+    env_results = verify_environment_protection(protocol, headers)
+    results.update(env_results)
+
     return results
 
 
